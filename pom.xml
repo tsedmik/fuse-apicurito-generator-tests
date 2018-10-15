@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.github.tsedmik</groupId>
+    <artifactId>fuse-apicurito-generator-tests</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Tomas Sedmik</name>
+            <email>tomas.sedmik@gmail.com</email>
+            <organization>Red Hat</organization>
+            <organizationUrl>http://www.redhat.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <build>
+        <plugins>
+
+            <!-- clone fuse-apicurito-generator Git Hub repository -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.11.1</version>
+                <executions>
+                    <execution>
+                        <id>checkout-fuse-apicurito-generator</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <connectionUrl>scm:git:https://github.com/jboss-fuse/fuse-apicurito-generator.git</connectionUrl>
+                            <developerConnection>scm:git:https://github.com/jboss-fuse/fuse-apicurito-generator.git</developerConnection>
+                            <workingDirectory>target/fuse-apicurito-generator</workingDirectory>
+                            <checkoutDirectory>target/fuse-apicurito-generator</checkoutDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- build fuse-apicurito-generator project -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <id>build-fuse-apicurito-generator</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>mvn</executable>
+                            <workingDirectory>target/fuse-apicurito-generator</workingDirectory>
+                            <arguments>
+                                <argument>package</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- run fuse-apicurito-generator and generate the project -->
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <id>run-fuse-apicurito-generator</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                def process = "java -jar ${project.build.directory}/fuse-apicurito-generator/target/fuse-apicurito-generator-1.0-SNAPSHOT.jar".execute()
+                                def output = new StringBuffer()
+                                process.consumeProcessOutput(output, System.err)
+                                while (!output.contains("com.redhat.fuse.apicurio.Application     : Started Application")) {
+                                   println "fuse-apicurito-generator is not started yet -> waiting"
+                                   sleep(1000)
+                                }
+                                def process2 = "curl -s -X POST -H @${project.basedir}/resources/headers.txt -d @${project.basedir}/resources/openapi-spec.json http://localhost:8080/api/v1/generate/camel-project.zip -o ${project.build.directory}/example.zip".execute()
+                                process2.waitFor()
+                                process.destroy()
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
