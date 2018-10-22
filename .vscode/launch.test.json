@@ -1,0 +1,30 @@
+{
+    "run": {
+        "default": "",
+        "items": [
+            {
+                "name": "fuse-apicurito-generator-tests",
+                "projectName": "fuse-apicurito-generator-tests",
+                "workingDirectory": "/home/tsedmik/devel/git/fuse-apicurito-generator-tests",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    },
+    "debug": {
+        "default": "",
+        "items": [
+            {
+                "name": "fuse-apicurito-generator-tests",
+                "projectName": "fuse-apicurito-generator-tests",
+                "workingDirectory": "/home/tsedmik/devel/git/fuse-apicurito-generator-tests",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    }
+}
