@@ -36,13 +36,14 @@ public class BuildTest {
 	public void testMavenRun() throws IOException, InterruptedException {
 		log.info("Building the project...");
 		File projectDir = new File("target/example");
-		Process process = Runtime.getRuntime().exec("mvn -f " + projectDir.getAbsolutePath() + " clean package");
+		File mavenSettings = new File("resources/settings.xml");
+		Process process = Runtime.getRuntime().exec("mvn -f " + projectDir.getAbsolutePath() + " -s " + mavenSettings.getAbsolutePath() + " clean package");
 		logProcessOutput(process);
 		assertTrue("Something went wrong during the build of the project", process.waitFor() == 0);
 		log.info("The project was built");
 
 		log.info("Starting the application...");
-		Process process2 = Runtime.getRuntime().exec("mvn -f " + projectDir.getAbsolutePath() + " spring-boot:run");
+		Process process2 = Runtime.getRuntime().exec("mvn -f " + projectDir.getAbsolutePath() + " -s " + mavenSettings.getAbsolutePath() + " spring-boot:run");
 		assertTrue("The application was not started properly\n",
 				checkAndlogProcessOutput(process2, "io.example.openapi.Application           : Started Application"));
 		log.info("The application is started");
