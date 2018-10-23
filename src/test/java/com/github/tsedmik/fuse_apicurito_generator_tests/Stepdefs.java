@@ -35,30 +35,25 @@ public class Stepdefs {
 	private String settingsFile;
 	private Process process;
 
-	@Given("^project generated via fuse-apicurito-generator$")
-	public void project_generated_via_fuse_apicurito_generator() throws Exception {
-		projectLocation = "target/example";
+	@Given("^project generated via fuse-apicurito-generator - \"([^\"]*)\"$")
+	public void project_generated_via_fuse_apicurito_generator(String arg1) throws Exception {
+	    projectLocation = arg1;
 	}
 
-	@Given("^'settings\\.xml' file for setting Maven to use non-public repositories$")
-	public void settings_xml_file_for_setting_Maven_to_use_non_public_repositories() throws Exception {
-		settingsFile = "src/test/resources/settings.xml";
+	@Given("^\"([^\"]*)\" file for setting Maven to use non-public repositories$")
+	public void file_for_setting_Maven_to_use_non_public_repositories(String arg1) throws Exception {
+	    settingsFile = arg1;
 	}
 
-	@When("^I execute 'mvn clean package'$")
-	public void i_execute_mvn_clean_package() throws Exception {
-		process = syncExecuteMaven(projectLocation, settingsFile, "clean package");
+	@When("^I execute Maven with goals \"([^\"]*)\"$")
+	public void i_execute_Maven_with_goals(String arg1) throws Exception {
+		process = syncExecuteMaven(projectLocation, settingsFile, arg1);
 	}
 
 	@Then("^The project is successfully built$")
 	public void the_project_is_successfully_built() throws Exception {
 		String log = getAndLogProcessOutPut(process);
 		assertTrue("Something went wrong during the build of the project", log.contains("BUILD SUCCESS"));
-	}
-
-	@When("^I execute 'mvn spring-boot:run'$")
-	public void i_execute_mvn_spring_boot_run() throws Exception {
-		process = syncExecuteMaven(projectLocation, settingsFile, "spring-boot:run");
 	}
 
 	@Then("^The project is running$")
