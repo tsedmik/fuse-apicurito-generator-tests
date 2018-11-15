@@ -71,8 +71,12 @@ public class Stepdefs {
 
 	private Process syncExecuteMaven(String projectLocation, String settingsFile, String goals) throws IOException, InterruptedException {
 		File projectDir = new File(projectLocation);
-		File mavenSettings = new File(settingsFile);
-		return Runtime.getRuntime().exec("mvn -f " + projectDir.getAbsolutePath() + " -s " + mavenSettings.getAbsolutePath() + " " + goals);
+		if (settingsFile != null) {
+			File mavenSettings = new File(settingsFile);
+			return Runtime.getRuntime().exec("mvn -f " + projectDir.getAbsolutePath() + " -s " + mavenSettings.getAbsolutePath() + " " + goals);
+		} else {
+			return Runtime.getRuntime().exec("mvn -f " + projectDir.getAbsolutePath() + " " + goals);
+		}
 	}
 	private String getAndLogProcessOutPut(Process process) throws IOException {
 		StringBuilder builder = new StringBuilder();

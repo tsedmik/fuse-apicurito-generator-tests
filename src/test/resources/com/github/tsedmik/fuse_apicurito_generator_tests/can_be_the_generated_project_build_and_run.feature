@@ -3,13 +3,11 @@ Feature: Can be the generated project build and run?
 
   Scenario: Build the project
     Given project generated via fuse-apicurito-generator - "target/example"
-    And "src/test/resources/settings.xml" file for setting Maven to use non-public repositories
     When I execute Maven with goals "clean package"
     Then The project is successfully built
 
   Scenario: Run the project
     Given project generated via fuse-apicurito-generator - "target/example"
-    And "src/test/resources/settings.xml" file for setting Maven to use non-public repositories
     When I execute Maven with goals "spring-boot:run"
     Then The project is running
     Then The file on 'http://localhost:8080/openapi.json' is accessible
