@@ -65,7 +65,7 @@ public class Stepdefs {
 	public void the_file_on_http_localhost_openapi_json_is_accessible(int arg1) throws Exception {
 		InputStream in = new URL("http://localhost:8080/openapi.json").openStream();
 		String result = new BufferedReader(new InputStreamReader(in)).lines().collect(Collectors.joining("\n"));
-		assertTrue(result.contains("\"swagger\": \"2.0\""));
+		assertTrue(result.contains("\"swagger\" : \"2.0\""));
 		process.destroy();
 	}
 
