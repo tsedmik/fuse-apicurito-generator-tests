@@ -1,3 +1,4 @@
+@SmokeTests
 Feature: OpenAPI file
   This feature covers scenarios related to OpenAPI file and its transformations
 

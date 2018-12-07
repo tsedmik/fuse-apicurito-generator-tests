@@ -21,6 +21,6 @@ import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(plugin = {"pretty"})
-public class RunCucumberTest {
+@CucumberOptions(plugin = {"pretty"}, tags = {"@SmokeTests"})
+public class SmokeTests {
 }

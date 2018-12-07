@@ -1,3 +1,4 @@
+@SmokeTests
 Feature: Can be the generated project build and run?
   Users want a project (as an output of fuse-apicurito-generator) which can be built and run out-of-the-box
 
