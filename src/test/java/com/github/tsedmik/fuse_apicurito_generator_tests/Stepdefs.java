@@ -41,6 +41,7 @@ public class Stepdefs {
 	private String projectName = "example";
 	private String settingsFile;
 	private Process process;
+	private String openshiftURL;
 
 	@Given("^\"([^\"]*)\" file for setting Maven to use non-public repositories$")
 	public void file_for_setting_Maven_to_use_non_public_repositories(String arg1) throws Exception {
@@ -54,14 +55,14 @@ public class Stepdefs {
 
 	@Then("^The project is successfully built$")
 	public void the_project_is_successfully_built() throws Exception {
-		String log = getAndLogProcessOutPut(process);
+		String log = Utils.getProcessOutPut(process, true);
 		assertTrue("Something went wrong during the build of the project", log.contains("BUILD SUCCESS"));
 	}
 
 	@Then("^The project is running$")
 	public void the_project_is_running() throws Exception {
 		assertTrue("The application was not started properly\n",
-				checkAndlogProcessOutput(process, "io.example.openapi.Application           : Started Application"));
+				Utils.checkAndlogProcessOutput(process, "io.example.openapi.Application           : Started Application"));
 	}
 
 	@Then("^The file on 'http://localhost:(\\d+)/openapi\\.json' is accessible$")
@@ -93,7 +94,7 @@ public class Stepdefs {
 			fail("fuse-apicurito-generator is not built --> cannot proceed");
 		}
 		Process generatorProcess = Runtime.getRuntime().exec("java -jar " + generatorJar.getAbsolutePath());
-		checkAndlogProcessOutput(generatorProcess, "com.redhat.fuse.apicurio.Application     : Started Application");
+		Utils.checkAndlogProcessOutput(generatorProcess, "com.redhat.fuse.apicurio.Application     : Started Application");
 		File headersFile = new File(System.getProperty("user.dir") + "/src/test/resources/headers.txt");
 		File unzipSource = new File(System.getProperty("user.dir") + "/target/" + projectName + ".zip");
 		File unzipDestination = new File(System.getProperty("user.dir") + "/target/" + projectName);
@@ -117,6 +118,35 @@ public class Stepdefs {
 		}
 	}
 
+	@Given("^An OpenShift instance running on the current machine$")
+    public void a_running_OpenShift_instance_The_URL_can_be_found_in_system_variable() throws Exception {
+		process = Runtime.getRuntime().exec("minishift ip");
+		String ip = Utils.getProcessOutPut(process, false);
+        openshiftURL = "https://" + ip + ":8443";
+    }
+
+    @Given("^I login to the OpenShift instance with `oc` as a \"([^\"]*)\" with password \"([^\"]*)\"$")
+    public void i_login_to_the_OpenShift_instance_with_oc_as_a_with_password(String arg1, String arg2)
+            throws Exception {
+        i_execute_shell_command("oc login -u " + arg1 + " -p " + arg2 + " " + openshiftURL);
+    }
+
+    @Given("^I execute shell command - \"([^\"]*)\"$")
+    public void i_execute_shell_command(String arg1) throws Exception {
+        process = Runtime.getRuntime().exec(arg1);
+        assertTrue("The command did not terminate normally", process.waitFor() == 0);
+    }
+
+    @Given("^I execute shell command - \"([^\"]*)\" \\(this could fail\\)$")
+    public void i_execute_shell_command_this_could_fail(String arg1) throws Exception {
+        process = Runtime.getRuntime().exec(arg1);
+	}
+
+	@Then("^the project is successfully deployed and running on OpenShift$")
+    public void the_project_is_successfully_deployed_and_running_on_OpenShift() throws Exception {
+        assertTrue("The build process failed", Utils.checkAndlogProcessOutput(process, "BUILD SUCCESS"));
+    }
+
 	private Process syncExecuteMaven(String projectLocation, String settingsFile, String goals)
 			throws IOException, InterruptedException {
 		File projectDir = new File(System.getProperty("user.dir") + "/" + projectLocation);
@@ -127,36 +157,5 @@ public class Stepdefs {
 		} else {
 			return Runtime.getRuntime().exec("mvn -f " + projectDir.getAbsolutePath() + " " + goals);
 		}
-	}
-
-	private String getAndLogProcessOutPut(Process process) throws IOException {
-		StringBuilder builder = new StringBuilder();
-		try (InputStreamReader is = new InputStreamReader(process.getInputStream());
-				BufferedReader reader = new BufferedReader(is)) {
-			String line = reader.readLine();
-			while (line != null) {
-				builder.append(line);
-				System.out.println(line);
-				line = reader.readLine();
-			}
-		}
-		return builder.toString();
-	}
-
-	private boolean checkAndlogProcessOutput(Process process, String checkText) throws IOException {
-		boolean isConditionMet = false;
-		try (InputStreamReader is = new InputStreamReader(process.getInputStream());
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-			String line = reader.readLine();
-			while (line != null && !isConditionMet) {
-				System.out.println(line);
-				if (line.contains(checkText)) {
-					isConditionMet = true;
-					break;
-				}
-				line = reader.readLine();
-			}
-		}
-		return isConditionMet;
 	}
 }

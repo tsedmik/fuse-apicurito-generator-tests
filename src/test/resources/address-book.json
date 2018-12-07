@@ -1,0 +1,108 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "AddressBook API",
+        "description": "My address book",
+        "version": "1.0"
+    },
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/addresses": {
+            "get": {
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/address"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of addresses"
+                    }
+                }
+            },
+            "post": {
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/address"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Address added"
+                    }
+                }
+            }
+        },
+        "/addresses/{addressId}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Address returned"
+                    }
+                }
+            },
+            "put": {
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/address"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Address updated"
+                    }
+                }
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "Address deleted"
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "name": "addressId",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ]
+        }
+    },
+    "definitions": {
+        "address": {
+            "title": "Root Type for address",
+            "description": "The root of the address type's schema.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
