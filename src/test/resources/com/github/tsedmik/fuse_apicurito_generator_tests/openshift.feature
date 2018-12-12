@@ -8,7 +8,7 @@ Feature: fuse-apicurito-generator is working with an OpenShift
 
   Background: Prepare OpenShift instance
     Given An OpenShift instance running on the current machine
-    And I login to the OpenShift instance with `oc` as a "developer" with password "developer"
+    And I login to the OpenShift instance with `oc` as a "admin" with password "admin"
     # delete old project for a fresh start
     And I execute shell command - "oc delete project test-camel --wait=true" (this could fail)
     # create a new OpenShift project
