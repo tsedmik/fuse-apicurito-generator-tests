@@ -133,19 +133,46 @@ public class Stepdefs {
 
     @Given("^I execute shell command - \"([^\"]*)\"$")
     public void i_execute_shell_command(String arg1) throws Exception {
-        process = Runtime.getRuntime().exec(arg1);
+		process = Runtime.getRuntime().exec(arg1);
         assertTrue("The command did not terminate normally", process.waitFor() == 0);
     }
 
     @Given("^I execute shell command - \"([^\"]*)\" \\(this could fail\\)$")
     public void i_execute_shell_command_this_could_fail(String arg1) throws Exception {
-        process = Runtime.getRuntime().exec(arg1);
+		process = Runtime.getRuntime().exec(arg1);
+		process.waitFor();
 	}
 
 	@Then("^the project is successfully deployed and running on OpenShift$")
     public void the_project_is_successfully_deployed_and_running_on_OpenShift() throws Exception {
-        assertTrue("The build process failed", Utils.checkAndlogProcessOutput(process, "BUILD SUCCESS"));
-    }
+		assertTrue("The build process failed", Utils.checkAndlogProcessOutput(process, "BUILD SUCCESS"));
+		boolean isStarted = false;
+		for (int i = 0; i < 30; i++) {
+			process = Runtime.getRuntime().exec("oc status");
+			String result = Utils.getProcessOutPut(process, false);
+			if (result.contains("deployed")) {
+				isStarted = true;
+				break;
+			}
+			Thread.sleep(5000);
+		}
+		assertTrue("The application is not deployed on OpenShift", isStarted);
+	}
+
+	@Then("^the project exposes a service with 3scale annotations$")
+    public void the_project_exposes_a_service_with_3scale_annotations() throws Exception {
+		process = Runtime.getRuntime().exec("oc get services -o yaml");
+		String service = Utils.getProcessOutPut(process, false);
+		assertTrue("3scale annotations are not present", service.contains("discovery.3scale.net/description-path: /openapi.json"));
+		assertTrue("3scale annotations are not present", service.contains("discovery.3scale.net/discovery-version: v1"));
+		assertTrue("3scale annotations are not present", service.contains("discovery.3scale.net/port: \"8080\""));
+		assertTrue("3scale annotations are not present", service.contains("discovery.3scale.net/scheme: http"));
+	}
+
+	@Then("^Wait for \"([^\"]*)\" seconds$")
+    public void wait_for_seconds(String arg1) throws Exception {
+		Thread.sleep(Integer.parseInt(arg1) * 1000);
+	}
 
 	private Process syncExecuteMaven(String projectLocation, String settingsFile, String goals)
 			throws IOException, InterruptedException {
