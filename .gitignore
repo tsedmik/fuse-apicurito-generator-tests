@@ -1,2 +1,12 @@
 target/
 log-camel-lsp.out
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Maven
+log/
+target/
+*.versionsBackup

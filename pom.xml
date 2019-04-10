@@ -39,6 +39,10 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<test>SmokeTests</test>
+		<project.scm.connection>scm:git:https://github.com/jboss-fuse/fuse-apicurito-generator.git</project.scm.connection>
+		<project.scm.developerConnection>scm:git:https://github.com/jboss-fuse/fuse-apicurito-generator.git</project.scm.developerConnection>
+		<working.directory>target/fuse-apicurito-generator</working.directory>
+		<project.scm.branch>release-work-1.0.0.fuse-730</project.scm.branch>
 	</properties>
 
 	<build>
@@ -57,10 +61,12 @@
 							<goal>checkout</goal>
 						</goals>
 						<configuration>
-							<connectionUrl>scm:git:https://github.com/jboss-fuse/fuse-apicurito-generator.git</connectionUrl>
-							<developerConnection>scm:git:https://github.com/jboss-fuse/fuse-apicurito-generator.git</developerConnection>
-							<workingDirectory>target/fuse-apicurito-generator</workingDirectory>
-							<checkoutDirectory>target/fuse-apicurito-generator</checkoutDirectory>
+							<connectionUrl>${project.scm.connection}</connectionUrl>
+							<developerConnectionUrl>${project.scm.developerConnection}</developerConnectionUrl>
+							<workingDirectory>${working.directory}</workingDirectory>
+							<checkoutDirectory>${working.directory}</checkoutDirectory>
+							<scmVersion>${project.scm.branch}</scmVersion>
+							<scmVersionType>branch</scmVersionType>
 						</configuration>
 					</execution>
 				</executions>

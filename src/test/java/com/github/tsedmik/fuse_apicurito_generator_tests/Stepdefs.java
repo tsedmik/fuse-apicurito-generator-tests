@@ -20,12 +20,15 @@ import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -42,6 +45,7 @@ public class Stepdefs {
 	private String settingsFile;
 	private Process process;
 	private String openshiftURL;
+	private Pattern pattern = Pattern.compile("^fuse-apicurito-generator-.*.[^source].jar$");
 
 	@Given("^\"([^\"]*)\" file for setting Maven to use non-public repositories$")
 	public void file_for_setting_Maven_to_use_non_public_repositories(String arg1) throws Exception {
@@ -89,7 +93,17 @@ public class Stepdefs {
 		if (!openAPI.exists()) {
 			fail("OpenAPI file does not exists --> cannot proceed");
 		}
-		File generatorJar = new File(System.getProperty("user.dir") + "/target/fuse-apicurito-generator/target/fuse-apicurito-generator-1.0-SNAPSHOT.jar");
+
+		File dir = new File(System.getProperty("user.dir") + "/target/fuse-apicurito-generator/target/");
+		File[] listOfFiles = dir.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				Matcher matcher = pattern.matcher(name);
+				return matcher.matches();
+			}
+		});
+
+		File generatorJar = new File(listOfFiles[0].toString());
 		if (!generatorJar.exists()) {
 			fail("fuse-apicurito-generator is not built --> cannot proceed");
 		}
